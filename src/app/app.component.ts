@@ -1,16 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './core/services/utilities/theme.service';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet />
-  `,
+  template: ` <router-outlet></router-outlet> `,
   styles: [],
 })
 export class AppComponent {
-  title = 'ReservationAdmin';
+  constructor() {
+    inject(ThemeService).setupDeviceThemeListener();
+  }
 }
