@@ -1,0 +1,38 @@
+<h1 matDialogTitle>Ajouter une reservation</h1>
+<mat-divider></mat-divider>
+<mat-dialog-content>
+  <form
+    style="display: flex; flex-wrap: wrap; gap: 1rem"
+    [formGroup]="AddReservationForm"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Nom complet</mat-label>
+      <input type="text" matInput formControlName="Fullname" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Mode de paiement</mat-label>
+      <input type="text" formControlName="modePaiement" matInput />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Adresse mail</mat-label>
+      <input type="email" formControlName="email" matInput />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Date de reservation</mat-label>
+      <input type="text" formControlName="dateReservation" matInput />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Prix</mat-label>
+      <input type="text" formControlName="price" matInput />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Durée</mat-label>
+      <input type="text" formControlName="duree" matInput />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-divider></mat-divider>
+<mat-dialog-actions>
+  <button mat-button matDialogClose>Annuler</button>
+  <button mat-flat-button>Ajouter</button>
+</mat-dialog-actions>

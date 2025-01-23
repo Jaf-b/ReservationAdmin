@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { APP_NAME } from '../../constant.app';
+import { APP_NAME, IS_MEDIUM } from '../../constant.app';
 import { MatDivider } from '@angular/material/divider';
 import { MatStepperModule } from '@angular/material/stepper';
 import { Router, RouterLink } from '@angular/router';
@@ -19,6 +19,8 @@ import { User } from '@angular/fire/auth';
 import { LoginService } from '../../core/services/firebase/login.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
+import { WindowsService } from '../../core/services/utilities/windows.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-registration',
@@ -33,6 +35,7 @@ import { Subscription } from 'rxjs';
     RouterLink,
     ReactiveFormsModule,
     FormsModule,
+    CommonModule,
   ],
   templateUrl: 'registration.component.html',
   styles: `
@@ -48,11 +51,20 @@ import { Subscription } from 'rxjs';
         width:35%;
       }
     }
+    .big{
+    max-width:30rem;
+    margin:2rem auto
+   }.small{
+    max-width:350px;
+    margin:2rem auto;
+   }
   `,
 })
 export default class RegistrationComponent {
   isLoggin = false;
   appname = APP_NAME;
+  currentWidth = inject(WindowsService).width;
+  mediumWidth = IS_MEDIUM;
   auth = inject(LoginService);
   authSub!: Subscription;
   emailSet = signal('');

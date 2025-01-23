@@ -1,4 +1,5 @@
 <mat-card
+  [ngClass]="mediumWidth <= currentWidth() ? 'big' : 'small'"
   style="width: max-content; margin: 3rem auto; text-align: center"
   appearance="outlined"
 >
@@ -19,8 +20,23 @@
   </mat-card-header>
   <mat-divider />
   <mat-card-content style="margin-top: 1rem">
-    <mat-stepper>
-      <mat-step [editable]="!isLoggin" linear>
+    <mat-stepper linear>
+      <mat-step [editable]="!isLoggin">
+        @if(emailSet()){
+        <mat-divider />
+        <div appearance="outlined" style="margin: 2rem auto">
+          <div style="padding: 2rem">
+            <span
+              ><b>l'email à été envoyé à l'adresse {{ emailSet() }}</b></span
+            ><br />
+            <br />
+            <button mat-button (click)="resetState()" style="margin-left: 58%">
+              email non reçus
+            </button>
+          </div>
+          <mat-divider />
+        </div>
+        } @else {
         <main>
           <button
             mat-flat-button
@@ -69,6 +85,7 @@
             </button>
           </form>
         </main>
+        }
       </mat-step>
       <form
         [formGroup]="RegistrationForm"

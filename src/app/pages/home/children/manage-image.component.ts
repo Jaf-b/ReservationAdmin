@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { EditsalleComponent } from '../../../shared/editsalle/editsalle.component';
 
 @Component({
   selector: 'app-manage-image',
-  imports: [MatIconModule, MatDividerModule],
+  imports: [MatIconModule, MatDividerModule, MatButtonModule],
   template: `
     <div
       style="display: flex;justify-content:space-between;align-items:center;padding:1rem"
@@ -23,11 +26,21 @@ import { MatIconModule } from '@angular/material/icon';
         <span>P.E Lumumba</span>
       </div>
       <div>
-        <mat-icon class="mat-18">edit</mat-icon>
+        <button mat-icon-button (click)="EditSalle()">
+          <mat-icon class="mat-18">edit</mat-icon>
+        </button>
       </div>
     </div>
     <mat-divider />
   `,
   styles: ``,
 })
-export class ManageImageComponent {}
+export class ManageImageComponent {
+  dialog = inject(MatDialog);
+
+  EditSalle = () => {
+    this.dialog.open(EditsalleComponent, {
+      width: '35rem',
+    });
+  };
+}

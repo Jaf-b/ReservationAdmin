@@ -10,6 +10,8 @@ import { WindowsService } from '../../../core/services/utilities/windows.service
 import { IS_MEDIUM } from '../../../constant.app';
 import { pipe } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AddreservationComponent } from '../../../shared/addreservation/addreservation.component';
 interface waitingTable {
   no: number;
   nomComplet: string;
@@ -70,7 +72,11 @@ const ELEMENT_DATA: waitingTable[] = [
         <mat-label style="font-weight:600;">Recherche</mat-label>
         <input type="text" matInput />
       </mat-form-field>
-      <button mat-flat-button style="border-radius:5px; height:55px;flex:1;">
+      <button
+        (click)="addReservation()"
+        mat-flat-button
+        style="border-radius:5px; height:55px;flex:1;"
+      >
         Ajouter un reservation
       </button>
     </div>
@@ -186,6 +192,7 @@ th{
 export default class WaitingReservationComponent implements OnInit {
   width = inject(WindowsService).width;
   mediumWidth = IS_MEDIUM;
+  dialog = inject(MatDialog);
   datasource = new MatTableDataSource(ELEMENT_DATA);
   ngOnInit(): void {
     this.datasource.paginator = this.paginator;
@@ -208,4 +215,9 @@ export default class WaitingReservationComponent implements OnInit {
     'Prix',
     'Action',
   ];
+  addReservation() {
+    this.dialog.open(AddreservationComponent, {
+      width: '35rem',
+    });
+  }
 }
