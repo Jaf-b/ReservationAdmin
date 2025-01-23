@@ -1,0 +1,246 @@
+<mat-card
+  style="width: max-content; margin: 3rem auto; text-align: center"
+  appearance="outlined"
+>
+  <mat-card-header style="text-align: center; margin: auto">
+    <mat-card-title>
+      <b>{{ appname }}</b>
+    </mat-card-title>
+    <mat-card-subtitle style="text-align: center">
+      <span>
+        <b>
+          Connecter vous et gerer vos Reservations <br />
+          en un seul clic
+
+          <a routerLink="/login" style="cursor: pointer">connectez-vous</a>
+        </b>
+      </span>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-divider />
+  <mat-card-content style="margin-top: 1rem">
+    <mat-stepper>
+      <mat-step [editable]="!isLoggin" linear>
+        <main>
+          <button
+            mat-flat-button
+            style="width: 100%"
+            (click)="loginWithGoogle()"
+          >
+            Connecter vous avec google
+          </button>
+          <div class="divider">
+            <mat-divider />
+            <span><b>ou avec</b></span>
+            <mat-divider />
+          </div>
+          <form
+            #EmailForm="ngForm"
+            align="end"
+            (ngSubmit)="emailFormSubmit(EmailForm)"
+          >
+            <mat-form-field
+              appearance="outline"
+              style="width: 100%; font-weight: 600"
+            >
+              <mat-label style="font-weight: 600">Email</mat-label>
+              <input
+                type="email"
+                name="email"
+                ngModel
+                #emails="ngModel"
+                required
+                email
+                matInput
+                placeholder="exemple@compy.org"
+              />
+              @if(!emails.errors?.['required'] && emails.errors?.['email']){
+              <mat-error style="font-weight: 600">Email invalid</mat-error>
+              }@else if (emails.errors?.['required']) {
+              <mat-error style="font-weight: 600">Email obligatoire</mat-error>
+              }
+            </mat-form-field>
+            <button
+              type="submit"
+              mat-flat-button
+              [disabled]="EmailForm.invalid"
+            >
+              Se connecter
+            </button>
+          </form>
+        </main>
+      </mat-step>
+      <form
+        [formGroup]="RegistrationForm"
+        action=""
+        style="margin-top: 1rem"
+        align="end"
+      >
+        <mat-step label="Enregistrement" align="end">
+          <mat-form-field style="margin-top: 1rem" appearance="outline">
+            <mat-label>Nom de la salle</mat-label>
+            <input
+              maxlength="20"
+              type="text"
+              formControlName="brandName"
+              matInput
+            />
+          </mat-form-field>
+          <div class="equipement" formArrayName="equipement">
+            <h3 style="text-align: left">Equipement</h3>
+            @for (item of RegistrationForm.controls.equipement.controls; track
+            $index) {
+            <div style="display: flex; gap: 1rem">
+              <mat-form-field appearance="outline">
+                <mat-label>Equipement</mat-label>
+                <input
+                  maxlength="20"
+                  [formControlName]="$index"
+                  type="text"
+                  matInput
+                />
+              </mat-form-field>
+              @if($index !== 0){
+              <button
+                type="button"
+                mat-icon-button
+                (click)="remove('eq', $index)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              }
+            </div>
+            }
+            <button type="button" mat-button (click)="add('equpe')">
+              <mat-icon>add_circle_outline</mat-icon> Equipement
+            </button>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Prix</mat-label>
+            <input
+              maxlength="12"
+              type="text"
+              formControlName="price"
+              matInput
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline" style="height: 120px">
+            <mat-label>Description</mat-label>
+            <textarea formControlName="description" matInput> </textarea>
+          </mat-form-field>
+          <div class="employee" formArrayName="employee">
+            <h3 style="text-align: left">Employée</h3>
+            @for (item of RegistrationForm.controls.employee.controls; track
+            $index) {
+            <div style="display: flex; gap: 1rem">
+              <mat-form-field appearance="outline">
+                <mat-label>Adresse mail de l'employée</mat-label>
+                <input
+                  maxlength="20"
+                  [formControlName]="$index"
+                  type="text"
+                  matInput
+                />
+              </mat-form-field>
+              @if($index !== 0){
+              <button
+                type="button"
+                mat-icon-button
+                (click)="remove('em', $index)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              }
+            </div>
+            }
+
+            <button type="button" mat-button (click)="add('em')">
+              <mat-icon>add_circle_outline</mat-icon> Employée
+            </button>
+          </div>
+          <mat-divider></mat-divider>
+          <button
+            type="button"
+            style="width: 100%; margin-top: 1rem"
+            mat-flat-button
+          >
+            Suivant
+          </button>
+        </mat-step>
+        <mat-step label="Image">
+          <div
+            style="
+              width: 100%;
+              background-color: red;
+              margin-top: 1rem;
+              height: 20rem;
+            "
+          >
+            <img
+              style="width: 100%; height: 100%; object-fit: cover"
+              #image
+              src="assets/Snapchat-10495370.jpg"
+            />
+          </div>
+
+          <div
+            style="diplay: flex; flex-direction: column"
+            formArrayName="image"
+          >
+            @for(item of RegistrationForm.controls.image.controls; track
+            $index){
+            <div style="display: flex; gap: 1rem; margin: 1rem auto">
+              <input
+                type="file"
+                hidden
+                [formControlName]="$index"
+                #img
+                accept=".png,.jpg,.jpeg"
+              />
+              <button
+                style="width: 100%"
+                mat-button
+                type="button"
+                (click)="img.click()"
+              >
+                {{
+                  RegistrationForm.controls.image.controls[$index].getRawValue()
+                    ? RegistrationForm.controls.image.controls[
+                        $index
+                      ].getRawValue()
+                    : "Ajouter une image"
+                }}
+              </button>
+              @if($index !== 0){
+              <button type="button" mat-icon-button (click)="removeImg($index)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              }
+            </div>
+            }
+          </div>
+
+          <button
+            (click)="addImg()"
+            style="margin: 1rem auto; margin-left: 20rem"
+            type="button"
+            mat-button
+          >
+            image
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+          <mat-divider></mat-divider>
+          <button
+            style="margin-top: 1rem; width: 100%"
+            type="button"
+            mat-flat-button
+            [disabled]="RegistrationForm.invalid"
+          >
+            creer votre salle
+          </button>
+        </mat-step>
+      </form>
+    </mat-stepper>
+  </mat-card-content>
+</mat-card>

@@ -11,6 +11,7 @@ import {
   signOut,
   user,
 } from '@angular/fire/auth';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root',
@@ -33,5 +34,6 @@ export class LoginService {
       signInWithEmailLink(this.auth, email!, location.href);
     }
   }
+
   logout = () => signOut(this.auth);
 }

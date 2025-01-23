@@ -26,7 +26,7 @@ import { Router } from '@angular/router';
   template: `
     <mat-toolbar>
       <div class="right_container">
-        @if(w() < Medium){
+        @if(w() <= Medium){
         <button mat-icon-button (click)="toggleDrawer()">
           <mat-icon class="mat-18">menu</mat-icon>
         </button>
@@ -50,17 +50,32 @@ import { Router } from '@angular/router';
     </mat-toolbar>
     <mat-divider></mat-divider>
     <mat-menu #menuRef="matMenu">
-      <button mat-menu-item [matMenuTriggerFor]="menuRef2">Theme</button>
-      <button mat-menu-item (click)="logout()">Deconnexion</button>
+      <button mat-menu-item>
+        <mat-icon>manage_accounts</mat-icon>
+        Gerer votre compte
+      </button>
+      <button mat-menu-item [matMenuTriggerFor]="menuRef2">
+        <mat-icon>dark_mode</mat-icon>
+        Theme
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon class="">logout</mat-icon>
+        Deconnexion
+      </button>
     </mat-menu>
     <mat-menu #menuRef2="matMenu">
       <button mat-menu-item (click)="switchTheme('light-theme')">
+        <mat-icon>light_mode</mat-icon>
         Mode Claire
       </button>
       <button mat-menu-item (click)="switchTheme('dark-theme')">
+        <mat-icon>dark_mode</mat-icon>
         Mode sombre
       </button>
       <button mat-menu-item (click)="switchTheme('device-theme')">
+        <mat-icon class="mat-18"
+          >{{ Medium > w() ? 'smartphone' : 'computer' }}
+        </mat-icon>
         Thème de l'appareil
       </button>
     </mat-menu>
@@ -82,6 +97,7 @@ import { Router } from '@angular/router';
     cursor:pointer;
   }
   }
+
 
   `,
 })

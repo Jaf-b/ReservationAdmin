@@ -1,7 +1,7 @@
 import { User } from '@angular/fire/auth';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { APP_NAME, COMPANY_NAME } from '../../constant.app';
+import { APP_NAME, COMPANY_NAME, IS_MEDIUM } from '../../constant.app';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
@@ -9,8 +9,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule, NgForm } from '@angular/forms';
 import { LoginService } from '../../core/services/firebase/login.service';
+import { MatStepperModule } from '@angular/material/stepper';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { WindowsService } from '../../core/services/utilities/windows.service';
 @Component({
   selector: 'app-login',
   imports: [
@@ -21,17 +24,24 @@ import { Router } from '@angular/router';
     MatInputModule,
     FormsModule,
     MatSnackBarModule,
+    CommonModule,
+    MatStepperModule,
+    RouterLink,
   ],
   template: `
     @if(emailSet()){
-    <mat-card appearance="outlined" style="max-width:380px;margin:2rem auto">
+    <mat-card
+      [ngClass]="mediumWidth < currentWidth() ? 'big' : 'small'"
+      appearance="outlined"
+      style="margin:2rem auto"
+    >
       <mat-card-header style="padding: 1rem;">
         <mat-card-title align="center">
           <b>{{ appname }}</b>
         </mat-card-title>
-        <mat-card-subtitle
-          ><span style="text-align: center">
-            <b> Connecter vous et gerer vos Reservations</b>
+        <mat-card-subtitle style="text-align:center"
+          ><span>
+            <b> Connecter vous et gerer vos Reservations en un seul clic </b>
           </span></mat-card-subtitle
         >
       </mat-card-header>
@@ -54,14 +64,20 @@ import { Router } from '@angular/router';
       >
     </mat-card>
     } @else {
-    <mat-card appearance="outlined" style="max-width:380px;margin:2rem auto">
+    <mat-card
+      [ngClass]="mediumWidth < currentWidth() ? 'big' : 'small'"
+      appearance="outlined"
+    >
       <mat-card-header style="padding:1rem;">
         <mat-card-title align="center">
           <b>{{ appname }}</b>
         </mat-card-title>
-        <mat-card-subtitle
-          ><span style="text-align: center">
-            <b> Connecter vous et gerer vos Reservations</b>
+        <mat-card-subtitle style="text-align:center"
+          ><span>
+            <b>
+              Connecter vous et gerer vos Reservations en un seul clic
+              <a routerLink="/registration"> Ajouter une Salle ?</a></b
+            >
           </span></mat-card-subtitle
         >
       </mat-card-header>
@@ -136,12 +152,20 @@ import { Router } from '@angular/router';
         width:35%;
       }
     }
-
+   .big{
+    max-width:380px;
+    margin:2rem auto
+   }.small{
+    max-width:350px;
+    margin:2rem auto;
+   }
   `,
 })
 export default class LoginComponent implements OnInit, OnDestroy {
   appname = APP_NAME;
   router = inject(Router);
+  currentWidth = inject(WindowsService).width;
+  mediumWidth = IS_MEDIUM;
   authSub!: Subscription;
   snackBar = inject(MatSnackBar);
   companyname = COMPANY_NAME;
@@ -152,7 +176,11 @@ export default class LoginComponent implements OnInit, OnDestroy {
     try {
       await this.auth.loginWithgoogle();
     } catch (e) {
-      this.snackBar.open("Une erreur s'est produite", 'fermer');
+      this.snackBar.open("Une erreur s'est produite", 'fermer', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
     }
   };
   emailFormSubmit(form: NgForm) {

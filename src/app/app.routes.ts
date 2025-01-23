@@ -12,13 +12,19 @@ export const routes: Routes = [
     path: 'login',
     title: `Connexion - ${APP_NAME}`,
     loadComponent: () => import('./pages/auth/login.component'),
-    ...canActivate(redirectToHome),
+    //...canActivate(redirectToHome),
+  },
+  {
+    path: 'registration',
+    title: `AJouter un Salle - ${APP_NAME}`,
+    loadComponent: () => import('./pages/auth/registration.component'),
+    //...canActivate(redirectToHome),
   },
   {
     path: 'home',
     title: `Home - ${APP_NAME}`,
     loadComponent: () => import('./pages/home/home.component'),
-    ...canActivate(redirectToLogin),
+    //...canActivate(redirectToLogin),
     children: [
       {
         path: 'reservation',

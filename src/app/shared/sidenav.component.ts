@@ -20,8 +20,8 @@ import { IS_MEDIUM } from '../constant.app';
     <mat-drawer-container autosize>
       <mat-drawer
         #drawer
-        [mode]="w() < Medium ? 'over' : 'side'"
-        [opened]="w() < Medium ? isToggleDrawer() : true"
+        [mode]="w() <= Medium ? 'over' : 'side'"
+        [opened]="w() <= Medium ? isToggleDrawer() : true"
       >
         <div>
           <a
