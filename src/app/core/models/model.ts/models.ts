@@ -10,6 +10,7 @@ export interface SalleDataForm<T> {
   };
   brandName: string;
   price: string;
+  NbrePlace: string;
   description: string;
   Adresse: string;
   equipement: string[];

@@ -5,8 +5,13 @@ import {
   redirectLoggedInTo,
   redirectUnauthorizedTo,
 } from '@angular/fire/auth-guard';
+import { User } from '@angular/fire/auth';
+import { inject, Inject } from '@angular/core';
+import { FirestoreService } from './core/services/firebase/firestore.service';
+import { GuardComponent } from './shared/guard/guard.component';
 const redirectToLogin = () => redirectUnauthorizedTo(['login']);
 const redirectToHome = () => redirectLoggedInTo(['']);
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -23,6 +28,7 @@ export const routes: Routes = [
     title: `Home - ${APP_NAME}`,
     loadComponent: () => import('./pages/home/home.component'),
     ...canActivate(redirectToLogin),
+    canActivateChild: [GuardComponent],
     children: [
       {
         path: 'reservation',

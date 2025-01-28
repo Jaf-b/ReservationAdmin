@@ -25,6 +25,7 @@ import { User } from '@angular/fire/auth';
 import { waitingTable } from '../../../core/models/model.ts/models';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { DeleteReservationComponent } from '../../../shared/delete-reservation/delete-reservation.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-waiting-reservation',
@@ -120,11 +121,26 @@ import { DeleteReservationComponent } from '../../../shared/delete-reservation/d
           <ng-container matColumnDef="Action">
             <th mat-header-cell *matHeaderCellDef>Action</th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button (click)="removeReservation(element.id)">
+              <button
+                type="button"
+                mat-icon-button
+                (click)="removeReservation(element.id)"
+              >
                 <mat-icon>delete</mat-icon>
               </button>
-              <button mat-icon-button>
+              <button
+                type="button"
+                (click)="changeStatus(element)"
+                mat-icon-button
+              >
                 <mat-icon>check_circle</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                (click)="EditReservation(element)"
+              >
+                <mat-icon>edit</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -191,9 +207,13 @@ export default class WaitingReservationComponent
     this.Auth = this.user.subscribe(async (user) => {
       if (user) {
         this.data = user;
-
+        localStorage.setItem('UserInfo', JSON.stringify(this.data));
+        let rsvt: waitingTable[] = [];
         this.fs.getReservation(this.salleName).subscribe((reservation: any) => {
-          this.datasource.data = reservation;
+          rsvt = reservation;
+          this.datasource.data = rsvt.filter(
+            (reservation) => reservation.status !== 'confirmer'
+          );
         });
       }
     });
@@ -201,6 +221,7 @@ export default class WaitingReservationComponent
   width = inject(WindowsService).width;
   mediumWidth = IS_MEDIUM;
   dialog = inject(MatDialog);
+  snackbar = inject(MatSnackBar);
   fs = inject(FirestoreService);
   Auth!: Subscription;
   user = inject(LoginService).user;
@@ -228,7 +249,6 @@ export default class WaitingReservationComponent
     this.dialog.open(AddreservationComponent, {
       width: '35rem',
       disableClose: true,
-      data: this.data,
     });
   }
   removeReservation(id: string) {
@@ -244,5 +264,21 @@ export default class WaitingReservationComponent
     if (this.datasource.paginator) {
       this.datasource.paginator.firstPage();
     }
+  }
+  changeStatus(data: waitingTable) {
+    console.log(data);
+    const reservation: waitingTable = data;
+    reservation.status = 'confirmer';
+    this.fs.setReservationToFirestore(reservation);
+    this.snackbar.open('reservation confirmer', 'ok', {
+      duration: 3000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+  }
+  EditReservation(data: waitingTable) {
+    this.dialog.open(AddreservationComponent, {
+      data: data,
+    });
   }
 }

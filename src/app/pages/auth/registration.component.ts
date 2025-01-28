@@ -87,6 +87,7 @@ export default class RegistrationComponent {
   RegistrationForm = this.fb.nonNullable.group({
     brandName: ['', Validators.required],
     price: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+    NbrePlace: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     description: ['', Validators.required],
     Adresse: ['', Validators.required],
     equipement: this.fb.nonNullable.array([
@@ -95,6 +96,7 @@ export default class RegistrationComponent {
     employee: this.fb.nonNullable.array([
       this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     ]),
+
     image: ['', Validators.required],
   });
 
@@ -195,6 +197,7 @@ export default class RegistrationComponent {
       user: this.userInfo,
       brandName: this.RegistrationForm.controls.brandName.getRawValue(),
       price: this.RegistrationForm.controls.price.getRawValue(),
+      NbrePlace: this.RegistrationForm.controls.NbrePlace.getRawValue(),
       description: this.RegistrationForm.controls.description.getRawValue(),
       Adresse: this.RegistrationForm.controls.Adresse.getRawValue(),
       equipement: this.RegistrationForm.controls.equipement.getRawValue(),

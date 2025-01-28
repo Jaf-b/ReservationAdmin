@@ -40,15 +40,15 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
           <span
             ><b>{{ data()[0].Adresse }}</b></span
           >
+          <span
+            ><b>{{ data()[0].NbrePlace }} places</b></span
+          >
         </div>
         <div>
           <button mat-icon-button (click)="EditSalle()">
             <mat-icon class="mat-18">edit</mat-icon>
           </button>
         </div>
-      </div>
-      <div class="img">
-        <img [src]="data()[0].image" />
       </div>
       <div class="equipement">
         <mat-chip-set>
@@ -60,6 +60,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
           }
         </mat-chip-set>
       </div>
+      <div class="img">
+        <img [src]="data()[0].image" />
+      </div>
+
       <div class="desc">
         <p>{{ data()[0].description }}</p>
       </div>

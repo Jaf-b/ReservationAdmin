@@ -34,20 +34,47 @@ import { mindate } from '../../core/models/model.ts/Validators';
   `,
 })
 export class AddreservationComponent implements OnInit {
-  constructor(@Inject(MAT_DIALOG_DATA) private data: User) {}
+  constructor(@Inject(MAT_DIALOG_DATA) private data: waitingTable) {}
   ngOnInit(): void {
     if (this.data) {
+      this.id = this.data.id;
+      this.message = 'Reservation Modifier avec Succès';
+      this.title = 'Modifier une Reservation';
+      this.AddReservationForm.patchValue(this.data);
+      this.AddReservationForm.controls.Fullname.patchValue(
+        this.data.nomComplet
+      );
+      this.AddReservationForm.controls.dateReservation.patchValue(
+        this.data.DateReservation
+      );
+      this.AddReservationForm.controls.duree.patchValue(this.data.duree);
+      this.AddReservationForm.controls.email.patchValue(this.data.adresseMail);
+      this.AddReservationForm.controls.modePaiement.patchValue(
+        this.data.paiement
+      );
+      this.AddReservationForm.controls.price.patchValue(this.data.prix);
+    } else {
+      this.id = this.fs.createID('Reservation');
+      this.message = 'Reservation Ajouter avec Succès';
+    }
+    const localStorageData = localStorage.getItem('UserInfo');
+    if (localStorageData) {
+      const data: User = JSON.parse(localStorageData);
       this.userInfo = {
-        ownerName: this.data.displayName,
-        ownerEmail: this.data.email,
-        ownerPicture: this.data.photoURL,
-        ownerID: this.data.uid,
+        ownerName: data.displayName,
+        ownerEmail: data.email,
+        ownerPicture: data.photoURL,
+        ownerID: data.uid,
       };
     }
   }
 
   fb = inject(FormBuilder);
   fs = inject(FirestoreService);
+  message!: string;
+  id!: string;
+  title: 'Ajouter une reservation' | 'Modifier une Reservation' =
+    'Ajouter une reservation';
   salleName: any = localStorage.getItem('salleName');
   matDialog = inject(MatDialog);
   snackbar = inject(MatSnackBar);
@@ -61,7 +88,6 @@ export class AddreservationComponent implements OnInit {
     modePaiement: ['', Validators.required],
   });
 
-  id = this.fs.createID('Reservation');
   AddReservation() {
     const data: waitingTable = {
       ownerID: this.userInfo.ownerID,
@@ -73,15 +99,13 @@ export class AddreservationComponent implements OnInit {
       DateReservation:
         this.AddReservationForm.controls.dateReservation.getRawValue(),
       duree: this.AddReservationForm.controls.duree.getRawValue(),
-      status: 'En Cours',
+      status: 'Encours',
       paiement: this.AddReservationForm.controls.modePaiement.getRawValue(),
       prix: this.AddReservationForm.controls.price.getRawValue(),
     };
-    console.log(data);
-
-    // this.fs.setReservationToFirestore(data);
+    this.fs.setReservationToFirestore(data);
     this.matDialog.closeAll();
-    this.snackbar.open('Ajouter avec succès', 'ok', {
+    this.snackbar.open(this.message, 'ok', {
       duration: 5000,
       verticalPosition: 'top',
       horizontalPosition: 'right',

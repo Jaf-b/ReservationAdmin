@@ -133,13 +133,21 @@
               <mat-icon>add_circle_outline</mat-icon> Equipement
             </button>
           </div>
-
           <mat-form-field appearance="outline">
             <mat-label>Prix</mat-label>
             <input
               maxlength="12"
               type="text"
               formControlName="price"
+              matInput
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de Place</mat-label>
+            <input
+              maxlength="12"
+              type="text"
+              formControlName="NbrePlace"
               matInput
             />
           </mat-form-field>

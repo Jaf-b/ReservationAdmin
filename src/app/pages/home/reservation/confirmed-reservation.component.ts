@@ -18,6 +18,7 @@ import { waitingTable } from '../../../core/models/model.ts/models';
 import { Subscription } from 'rxjs';
 import { FirestoreService } from '../../../core/services/firebase/firestore.service';
 import { LoginService } from '../../../core/services/firebase/login.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-confirmed-reservation',
   imports: [
@@ -46,7 +47,7 @@ import { LoginService } from '../../../core/services/firebase/login.service';
           <ng-container matColumnDef="No">
             <th mat-header-cell *matHeaderCellDef>No.</th>
             <td mat-cell *matCellDef="let element">
-              <b>{{ element.no }}</b>
+              <b>{{ datasource.filteredData.indexOf(element) + 1 }}</b>
             </td>
           </ng-container>
 
@@ -70,7 +71,7 @@ import { LoginService } from '../../../core/services/firebase/login.service';
           <ng-container matColumnDef="Date de reservation">
             <th mat-header-cell *matHeaderCellDef>Date de reservation</th>
             <td mat-cell *matCellDef="let element">
-              <b>{{ element.DateReservaiton }}</b>
+              <b>{{ element.DateReservation }}</b>
             </td>
           </ng-container>
           <ng-container matColumnDef="Duréé">
@@ -103,11 +104,8 @@ import { LoginService } from '../../../core/services/firebase/login.service';
           <ng-container matColumnDef="Action">
             <th mat-header-cell *matHeaderCellDef>Action</th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button>
-                <mat-icon>delete</mat-icon>
-              </button>
-              <button mat-icon-button>
-                <mat-icon>check_circle</mat-icon>
+              <button (click)="changeStatus(element)" mat-icon-button>
+                <mat-icon>cancel</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -166,14 +164,19 @@ export default class ConfirmedReservationComponent
   ngOnInit(): void {
     this.Auth = this.user.subscribe(async (user) => {
       if (user) {
+        let rsvt: waitingTable[] = [];
         this.fs.getReservation(this.salleName).subscribe((reservation: any) => {
-          this.datasource.data = reservation;
+          rsvt = reservation;
+          this.datasource.data = rsvt.filter(
+            (reservation) => reservation.status == 'confirmer'
+          );
         });
       }
     });
   }
   salleName: any = localStorage.getItem('salleName');
   fs = inject(FirestoreService);
+  snackbar = inject(MatSnackBar);
   Auth!: Subscription;
   user = inject(LoginService).user;
   width = inject(WindowsService).width;
@@ -206,5 +209,16 @@ export default class ConfirmedReservationComponent
     if (this.datasource.paginator) {
       this.datasource.paginator.firstPage();
     }
+  }
+  changeStatus(data: waitingTable) {
+    console.log(data);
+    const reservation: waitingTable = data;
+    reservation.status = 'Encours';
+    this.fs.setReservationToFirestore(reservation);
+    this.snackbar.open('reservation en Attente ', 'ok', {
+      duration: 3000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
   }
 }

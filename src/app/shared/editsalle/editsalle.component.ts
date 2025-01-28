@@ -67,8 +67,7 @@ export class EditsalleComponent implements OnInit {
         this.EditForm.controls.employee.push(formControl);
       });
       this.EditForm.controls.price.patchValue(this.data[0].price);
-      console.log(this.data);
-      console.log(this.displayImg);
+      this.EditForm.controls.NbrePlace.patchValue(this.data[0].NbrePlace);
     }
   }
 
@@ -83,6 +82,7 @@ export class EditsalleComponent implements OnInit {
   EditForm = this.fb.nonNullable.group({
     brandName: ['', Validators.required],
     price: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+    NbrePlace: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     description: ['', Validators.required],
     Adresse: ['', Validators.required],
     equipement: this.fb.nonNullable.array([
@@ -132,6 +132,7 @@ export class EditsalleComponent implements OnInit {
       user: this.data[0].user,
       brandName: this.EditForm.controls.brandName.getRawValue(),
       price: this.EditForm.controls.price.getRawValue(),
+      NbrePlace: this.EditForm.controls.NbrePlace.getRawValue(),
       description: this.EditForm.controls.description.getRawValue(),
       Adresse: this.EditForm.controls.Adresse.getRawValue(),
       equipement: this.EditForm.controls.equipement.getRawValue(),
