@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,12 +15,17 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { User } from '@angular/fire/auth';
+import { user, User } from '@angular/fire/auth';
 import { LoginService } from '../../core/services/firebase/login.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 import { WindowsService } from '../../core/services/utilities/windows.service';
 import { CommonModule } from '@angular/common';
+import { StorageService } from '../../core/services/firebase/storage.service';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { FirestoreService } from '../../core/services/firebase/firestore.service';
+import { SalleDataForm } from '../../core/models/model.ts/models';
+import { FieldValue, serverTimestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-registration',
@@ -36,6 +41,7 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
+    MatProgressBarModule,
   ],
   templateUrl: 'registration.component.html',
   styles: `
@@ -61,6 +67,12 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export default class RegistrationComponent {
+  @ViewChild('stepper') stepper: any;
+  userInfo: any;
+  loading = false;
+  storage = inject(StorageService);
+  fs = inject(FirestoreService);
+  displayImg!: string;
   isLoggin = false;
   appname = APP_NAME;
   currentWidth = inject(WindowsService).width;
@@ -71,19 +83,19 @@ export default class RegistrationComponent {
   router = inject(Router);
   snackBar = inject(MatSnackBar);
   fb = inject(FormBuilder);
+  imgArray: any[] = [];
   RegistrationForm = this.fb.nonNullable.group({
     brandName: ['', Validators.required],
     price: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     description: ['', Validators.required],
+    Adresse: ['', Validators.required],
     equipement: this.fb.nonNullable.array([
       this.fb.nonNullable.control('', Validators.required),
     ]),
     employee: this.fb.nonNullable.array([
       this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     ]),
-    image: this.fb.nonNullable.array([
-      this.fb.nonNullable.control('', Validators.required),
-    ]),
+    image: ['', Validators.required],
   });
 
   add = (params: string) => {
@@ -102,13 +114,7 @@ export default class RegistrationComponent {
       this.RegistrationForm.controls.equipement.removeAt(index);
     }
   };
-  addImg = () => {
-    const control = this.fb.nonNullable.control('');
-    this.RegistrationForm.controls.image.push(control);
-  };
-  removeImg = (index: number) => {
-    this.RegistrationForm.controls.image.removeAt(index);
-  };
+
   loginWithGoogle = async () => {
     try {
       await this.auth.loginWithgoogle();
@@ -133,17 +139,74 @@ export default class RegistrationComponent {
   }
   resetState = () => this.emailSet.set('');
   ngOnInit(): void {
-    this.authSub = this.auth.authsTate.subscribe((user: User | null) => {
+    this.authSub = this.auth.authsTate.subscribe(async (user: User | null) => {
       if (this.router.url.includes('?apiKey=')) {
         this.auth.LoginWithEmailLink();
       }
       if (user) {
-        this.router.navigate(['/']);
-        this.isLoggin = true;
+        if (await this.fs.SalleExist(user.uid)) {
+          this.router.navigate(['/']);
+        } else {
+          this.router.navigate(['/registration']);
+          this.stepper.next();
+          this.isLoggin = true;
+          this.snackBar.open('Aucune salle detectée', 'ok', {
+            duration: 5000,
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+          });
+        }
+        this.userInfo = {
+          ownerName: user.displayName,
+          ownerEmail: user.email,
+          ownerPicture: user.photoURL,
+          ownerID: user.uid,
+        };
       }
     });
   }
   ngOnDestroy(): void {
     this.authSub.unsubscribe();
+  }
+  AddtoStorage = async (file: any) => {
+    const files = file[0];
+    const fullpath: any = localStorage!.getItem('pathReference');
+    try {
+      this.loading = true;
+      if (fullpath) {
+        this.storage.DeleteImgToStorage();
+      }
+      const path = await this.storage.AddImagetoStorage(files);
+      this.displayImg = path;
+      this.imgArray.push(path);
+      console.log(this.imgArray);
+      console.log(path);
+      this.loading = false;
+    } catch (e) {}
+  };
+  nextStep() {
+    this.stepper.next();
+  }
+  id = this.fs.createID('SalleData');
+  AddDocsToStorage() {
+    const data: SalleDataForm<FieldValue> = {
+      ownerID: this.userInfo.ownerID,
+      id: this.id,
+      user: this.userInfo,
+      brandName: this.RegistrationForm.controls.brandName.getRawValue(),
+      price: this.RegistrationForm.controls.price.getRawValue(),
+      description: this.RegistrationForm.controls.description.getRawValue(),
+      Adresse: this.RegistrationForm.controls.Adresse.getRawValue(),
+      equipement: this.RegistrationForm.controls.equipement.getRawValue(),
+      employee: this.RegistrationForm.controls.employee.getRawValue(),
+      image: this.displayImg,
+      createAt: serverTimestamp(),
+      updateAt: serverTimestamp(),
+    };
+    this.loading = true;
+    this.fs.setDataToFirestore(data).then((e) => {
+      this.loading = false;
+      this.router.navigate(['/']);
+    });
   }
 }

@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { WindowsService } from '../../core/services/utilities/windows.service';
+import { FirestoreService } from '../../core/services/firebase/firestore.service';
 @Component({
   selector: 'app-login',
   imports: [
@@ -171,6 +172,7 @@ export default class LoginComponent implements OnInit, OnDestroy {
   companyname = COMPANY_NAME;
   date = new Date();
   auth = inject(LoginService);
+  fs = inject(FirestoreService);
   emailSet = signal('');
   loginWithGoogle = async () => {
     try {
@@ -196,12 +198,21 @@ export default class LoginComponent implements OnInit, OnDestroy {
   }
   resetState = () => this.emailSet.set('');
   ngOnInit(): void {
-    this.authSub = this.auth.authsTate.subscribe((user: User | null) => {
+    this.authSub = this.auth.authsTate.subscribe(async (user: User | null) => {
       if (this.router.url.includes('?apiKey=')) {
         this.auth.LoginWithEmailLink();
       }
       if (user) {
-        this.router.navigate(['/']);
+        if (await this.fs.SalleExist(user.uid)) {
+          this.router.navigate(['/']);
+        } else {
+          this.router.navigate(['/registration']);
+          this.snackBar.open('Aucune salle detectée', 'ok', {
+            duration: 5000,
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+          });
+        }
       }
     });
   }

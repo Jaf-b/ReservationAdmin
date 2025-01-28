@@ -55,6 +55,10 @@
           <mat-label>Description</mat-label>
           <textarea formControlName="description" matInput> </textarea>
         </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Adresse</mat-label>
+          <input formControlName="Adresse" matInput />
+        </mat-form-field>
         <div class="employee" formArrayName="employee">
           <h3 style="text-align: left">Employée</h3>
           @for (item of EditForm.controls.employee.controls; track $index) {
@@ -98,34 +102,27 @@
           Suivant
         </button>
       </mat-step>
-      <mat-step label="Image">
-        <div
-          style="
-            width: 100%;
-            background-color: red;
-            margin-top: 1rem;
-            height: 20rem;
-          "
-        >
+      <mat-step [editable]="isLoggin" label="Image">
+        @if(loading){
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+        <div style="width: 100%; margin-top: 1rem; height: 15rem">
           <img
-            style="width: 100%; height: 100%; object-fit: cover"
+            style="width: 100%; height: 100%; object-fit: contain"
             #image
-            src="assets/Snapchat-10495370.jpg"
+            [src]="displayImg ? displayImg : 'assets/gallery.png'"
           />
         </div>
 
-        <div
-          style="display: flex; width: 100%; flex-direction: column"
-          formArrayName="image"
-        >
-          @for(item of EditForm.controls.image.controls; track $index){
-          <div style="display: flex; gap: 1rem; margin: 0.5rem auto">
+        <div style="display: flex; flex-direction: column">
+          <div style="display: flex; gap: 1rem; margin: 1rem auto">
             <input
+              #img
               type="file"
               hidden
-              [formControlName]="$index"
-              #img
+              formControlName="image"
               accept=".png,.jpg,.jpeg"
+              (change)="changeImgToStorage(displayImg, img.files)"
             />
             <button
               style="width: 100%"
@@ -134,29 +131,13 @@
               (click)="img.click()"
             >
               {{
-                EditForm.controls.image.controls[$index].getRawValue()
-                  ? EditForm.controls.image.controls[$index].getRawValue()
+                EditForm.controls.image.getRawValue()
+                  ? EditForm.controls.image.getRawValue()
                   : "Ajouter une image"
               }}
             </button>
-            @if($index !== 0){
-            <button type="button" mat-icon-button (click)="removeImg($index)">
-              <mat-icon>delete</mat-icon>
-            </button>
-            }
           </div>
-          }
         </div>
-
-        <button
-          (click)="addImg()"
-          style="margin: 1rem auto; margin-left: 20rem"
-          type="button"
-          mat-button
-        >
-          image
-          <mat-icon>add_circle_outline</mat-icon>
-        </button>
       </mat-step>
     </form>
   </mat-stepper>
@@ -164,5 +145,7 @@
 <mat-divider></mat-divider>
 <mat-dialog-actions>
   <button mat-button matDialogClose>Annuler</button>
-  <button mat-flat-button [disabled]="EditForm.invalid">Modifier</button>
+  <button mat-flat-button [disabled]="EditForm.invalid" (click)="EditSalle()">
+    Modifier
+  </button>
 </mat-dialog-actions>

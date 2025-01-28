@@ -5,34 +5,70 @@
     style="display: flex; flex-wrap: wrap; gap: 1rem"
     [formGroup]="AddReservationForm"
   >
+    @let controls = AddReservationForm.controls;
     <mat-form-field appearance="outline">
       <mat-label>Nom complet</mat-label>
       <input type="text" matInput formControlName="Fullname" />
+      @if(controls.Fullname.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Mode de paiement</mat-label>
-      <input type="text" formControlName="modePaiement" matInput />
+      <mat-select formControlName="modePaiement" placeholder="">
+        <mat-option value="En présenciel">En Présenciel</mat-option>
+        <mat-option value="En ligne">En ligne</mat-option>
+      </mat-select>
+      @if(controls.modePaiement.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Adresse mail</mat-label>
       <input type="email" formControlName="email" matInput />
+      @if(controls.email.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }@else if (controls.email.hasError("email")) {
+      <mat-error>Email invalid</mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Date de reservation</mat-label>
-      <input type="text" formControlName="dateReservation" matInput />
+      <input type="date" formControlName="dateReservation" matInput />
+      @if(controls.dateReservation.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }@else if(controls.dateReservation.hasError("mindate")){
+      <mat-error>cette date est erronée</mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Prix</mat-label>
       <input type="text" formControlName="price" matInput />
+      @if(controls.price.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }@else if (controls.price.hasError("pattern")) {
+      <mat-error>de chiffre seulement</mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Durée</mat-label>
       <input type="text" formControlName="duree" matInput />
+      @if(controls.duree.hasError("required")){
+      <mat-error>ce champ est requis </mat-error>
+      }@else if (controls.duree) {
+      <mat-error>de chiffre seulement</mat-error>
+      }
     </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-divider></mat-divider>
 <mat-dialog-actions>
   <button mat-button matDialogClose>Annuler</button>
-  <button mat-flat-button>Ajouter</button>
+  <button
+    mat-flat-button
+    [disabled]="AddReservationForm.invalid"
+    (click)="AddReservation()"
+  >
+    Ajouter
+  </button>
 </mat-dialog-actions>

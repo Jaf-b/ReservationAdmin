@@ -3,9 +3,15 @@ import { provideRouter, withViewTransitions } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  provideFirestore,
+} from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { CdkStepper } from '@angular/cdk/stepper';
 
@@ -17,16 +23,24 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideFirebaseApp(() =>
       initializeApp({
-        projectId: 'gestion-de-reservation-6dc1f',
-        appId: '1:527335921204:web:ddbd1d68eb46b31ae81c61',
-        storageBucket: 'gestion-de-reservation-6dc1f.firebasestorage.app',
-        apiKey: 'AIzaSyAyHWpl1B272oPdGU5tEfMv3kzCP5KauUs',
-        authDomain: 'gestion-de-reservation-6dc1f.firebaseapp.com',
-        messagingSenderId: '527335921204',
+        apiKey: 'AIzaSyCkY20t0F4GqU9LbyV79Yiue_rlrutNxvc',
+        authDomain: 'reservationsalle-e1692.firebaseapp.com',
+        databaseURL:
+          'https://reservationsalle-e1692-default-rtdb.firebaseio.com',
+        projectId: 'reservationsalle-e1692',
+        storageBucket: 'reservationsalle-e1692.appspot.com',
+        messagingSenderId: '507980630667',
+        appId: '1:507980630667:web:bbca534ca4aba6505ae28e',
       })
     ),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() =>
+      initializeFirestore(getApp(), {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      })
+    ),
     provideStorage(() => getStorage()),
   ],
 };
